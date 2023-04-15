@@ -1,11 +1,11 @@
 import java.util.List;
 import java.util.ArrayList;
 
-public class MainTravellingSalesmanProblem {
+public class TravellingSalesmanProblem {
     Integer[] cities;
     List<Integer[]> permutations = new ArrayList<>();
 
-    public MainTravellingSalesmanProblem(int[][] graph, int startingCity) {
+    public TravellingSalesmanProblem(int[][] graph, int startingCity) {
         cities = new Integer[graph[0].length - 1];
         int i = 0;
         int j = 0;
@@ -19,8 +19,26 @@ public class MainTravellingSalesmanProblem {
 
         printAllRecursive(cities.length, cities, ' ');
     }
-    
-    public <T> void printAllRecursive(int n, T[] elements, char delimiter) {
+
+    public Integer travellingSalesmanProblem(int[][] graph, int startingCity) {
+        Integer minPath = Integer.MAX_VALUE;
+        for (Integer[] i : permutations) { // List<Integer[]> nextPermutation = permutations;
+            Integer currentPathweight = 0;
+
+            int k = startingCity;
+            for (Integer j : i) {
+                currentPathweight += graph[k][j];
+                k = j;
+            }
+            currentPathweight += graph[k][startingCity];
+
+            minPath = Math.min(minPath, currentPathweight);
+        }
+
+        return minPath;
+    }
+
+    private <T> void printAllRecursive(int n, T[] elements, char delimiter) {
         if(n == 1) {
             printArray(elements, delimiter);
         } else {
@@ -32,6 +50,7 @@ public class MainTravellingSalesmanProblem {
                     swap(elements, 0, n-1);
                 }
             }
+ 
             printAllRecursive(n - 1, elements, delimiter);
         }
     }
@@ -54,26 +73,9 @@ public class MainTravellingSalesmanProblem {
             result[i] = (Integer) input[i];
             System.out.print(input[i] + " ");
         }
+
         System.out.print("\n");
         permutations.add(result);
-    }
-
-    public Integer travellingSalesmanProblem(int[][] graph, int startingCity) {
-        Integer minPath = Integer.MAX_VALUE;
-        for (Integer[] i : permutations) { // List<Integer[]> nextPermutation = permutations;
-            Integer currentPathweight = 0;
-
-            int k = startingCity;
-            for (Integer j : i) {
-                currentPathweight += graph[k][j];
-                k = j;
-            }
-            currentPathweight += graph[k][startingCity];
-
-            minPath = Math.min(minPath, currentPathweight);
-        }
-
-        return minPath;
     }
     
     public static void main(String[] args) {
@@ -84,7 +86,7 @@ public class MainTravellingSalesmanProblem {
 
         int startingCity = 0;
         
-        MainTravellingSalesmanProblem tsp = new MainTravellingSalesmanProblem(graph, startingCity);
+        TravellingSalesmanProblem tsp = new TravellingSalesmanProblem(graph, startingCity);
         // tsp.printAllRecursive(tsp.cities.length, tsp.cities, ' ');
         System.out.println(tsp.travellingSalesmanProblem(graph, startingCity));
     }

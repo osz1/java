@@ -1,4 +1,4 @@
-public class MainFibonacci {
+public class Fibonacci {
     public static boolean fibonacci(long n) {
         long s1 = 0;
         long s2 = 1;

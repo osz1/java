@@ -1,16 +1,4 @@
-class Node {
-    int data;
-    Node left;
-    Node right;
-
-    public Node(int data, Node left, Node right) {
-        this.data = data;
-        this.left = left;
-        this.right = right;
-    }
-}
-
-public class MainMergeTwoBinaryTrees {
+public class MergeTwoBinaryTrees {
     public static Node newNode(int x) {
         return new Node(x, null, null);
     }
@@ -19,8 +7,11 @@ public class MainMergeTwoBinaryTrees {
         if (current == null) {
             return;
         }
+
         inorder(current.left);
+
         System.out.printf(current.data + " ");
+
         inorder(current.right);
     }
 
@@ -28,12 +19,15 @@ public class MainMergeTwoBinaryTrees {
         if (tree1 == null) {
             return tree2;
         }
+
         if (tree2 == null) {
             return tree1;
         }
+
         tree1.data += tree2.data;
         tree1.left = mergeTrees(tree1.left, tree2.left);
         tree1.right = mergeTrees(tree1.right, tree2.right);
+
         return tree1;
     }
 
@@ -65,6 +59,7 @@ public class MainMergeTwoBinaryTrees {
         root2.right.right = newNode(6);
 
         Node root3 = mergeTrees(root1, root2);
+
         System.out.println("Az összefésült bináris fa:");
         inorder(root3);
     }

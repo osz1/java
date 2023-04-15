@@ -1,6 +1,6 @@
 import java.util.Stack;
 
-public class MainRPN {
+public class RPN {
     public static int precedenceValue(String operator) {
         switch (operator) {
             case "^":
@@ -21,6 +21,7 @@ public class MainRPN {
         for (String element : expression.split(" ")) {
             strStack.push(element);
         }
+
         return strStack;
     }
 
@@ -50,10 +51,13 @@ public class MainRPN {
                     maxPrecedence = precedence;
                     maxPrecedenceIndex = i;
                 }
+
                 stack1.push(element);
             }
+
             i++;
         }
+
         i = 0;
         String maxPrecedenceNum1 = "";
         String maxPrecedenceOperator = "";
@@ -75,12 +79,15 @@ public class MainRPN {
             } else {
                 stack2.push(element);
             }
+
             i++;
         }
+
         stack1.clear();
         for (String element : stack2) {
             stack1.push(element);
         }
+
         stack2.clear();
         if (stack1.size() == 1) {
             return stack1.peek();

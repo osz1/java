@@ -12,6 +12,9 @@ public class Torpedo {
 
     private int[][] guessArray;
 
+    private int[] lifeOfShips;
+    private Scanner scan;
+
     public Torpedo() {
         random = new Random();
         shipPlacingHelper = new boolean[SIDE_LENGTH][SIDE_LENGTH]; // false
@@ -22,38 +25,63 @@ public class Torpedo {
         guessArray = new int[SIDE_LENGTH][SIDE_LENGTH]; // 0
     }
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("  ");
-        for (int l = 65; l < (65 + SIDE_LENGTH); l++) {
-            builder.append((char) l);
-            builder.append(' ');
+    public void runTorpedo() {
+        lifeOfShips = new int[LIST_OF_SHIPS.length];
+        for (int i = 0; i < LIST_OF_SHIPS.length; i++) {
+            lifeOfShips[i] = LIST_OF_SHIPS[i];
         }
-        builder.append("\n");
 
-        for (int i = 0; i < SIDE_LENGTH; i++) {
-            builder.append((i + 1) + " ");
-            for (int j = 0; j < SIDE_LENGTH; j++) {
-                switch (guessArray[i][j]) {
-                    case 0:
-                        builder.append('-');
-                        break;
-                    case 1:
-                        builder.append('O');
-                        break;
-                    case 2:
-                        builder.append('X');
-                        break;
+        scan = new Scanner(System.in);
+
+        System.out.println("\nValdi torpedó társasjátéka");
+        System.out.println("\nTipp formátuma:");
+        System.out.println("    első karakter (oszlop): nagybetű (A-H)");
+        System.out.println("    második karakter (sor): számok (1-8)");
+        System.out.println("\nA tábla jelmagyarázata:");
+        System.out.println("    O: volt tipp, de találat nem");
+        System.out.println("    X: volt tipp, sikeres találat");
+        System.out.println("    -: nem volt tipp");
+
+        int maxNumberOfGuesses = 40;
+
+        System.out.println("\nÖsszesen " + maxNumberOfGuesses + " tipp van.\n");
+
+        while (maxNumberOfGuesses > 0) {
+            String guess = scan.nextLine();
+            if (correctGuess(guess)) {
+                int[] field = getCoordinates(guess);
+                if (guessArray[field[0]][field[1]] == 0) {
+                    Integer index = shipField[field[0]][field[1]];
+                    if (index == null) {
+                        guessArray[field[0]][field[1]] = 1;
+                        System.out.println("\nNem talált.\n");
+                    } else {
+                        guessArray[field[0]][field[1]] = 2;
+                        System.out.println("\nTalált.\n");
+                        lifeOfShips[index]--;
+                        if (lifeOfShips[index] == 0) {
+                            System.out.println("Süllyedt.\n");
+                            if (allShipsAreSinked()) {
+                                System.out.println("\nSikerült megtalálni az összes hajót.\n");
+                                System.out.println(this);
+                                break;
+                            }
+                        }
+                    }
+
+                    System.out.println(this);
+                    maxNumberOfGuesses--;
+                    System.out.println("\n" + maxNumberOfGuesses + " tipp maradt.\n");
                 }
-
-                builder.append(' ');
             }
-
-            builder.append("\n");
         }
 
-        return builder.toString();
+        if (!allShipsAreSinked()) {
+            System.out.println("\nNem sikerült megtalálni az összes hajót.\n");
+            System.out.println("A megoldás:\n");
+            revealSolution();
+            System.out.println(this);
+        }
     }
 
     private int randomIndexGenerator() {
@@ -174,9 +202,6 @@ public class Torpedo {
         }
     }
 
-    private int[] lifeOfShips;
-    private Scanner scan;
-
     private boolean correctGuess(String guess) {
         if (guess.length() != 2) {
             return false;
@@ -184,12 +209,14 @@ public class Torpedo {
 
         String strReg = "[" + ((char) 65) + "-" + ((char) (65 + (SIDE_LENGTH - 1))) + "]";
         String numReg = "[" + 1 + "-" + SIDE_LENGTH + "]";
+
         return guess.substring(0, 1).matches(strReg) && guess.substring(1).matches(numReg);
     }
 
     private int[] getCoordinates(String guess) {
         int i = Integer.parseInt(guess.substring(1)) - 1;
         int j = ((int) guess.charAt(0)) - 65;
+
         return new int[] {i, j};
     }
 
@@ -215,63 +242,40 @@ public class Torpedo {
         }
     }
 
-    public void runTorpedo() {
-        lifeOfShips = new int[LIST_OF_SHIPS.length];
-        for (int i = 0; i < LIST_OF_SHIPS.length; i++) {
-            lifeOfShips[i] = LIST_OF_SHIPS[i];
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("  ");
+        for (int l = 65; l < (65 + SIDE_LENGTH); l++) {
+            builder.append((char) l);
+            builder.append(' ');
         }
 
-        scan = new Scanner(System.in);
+        builder.append("\n");
 
-        System.out.println("\nValdi torpedó társasjátéka");
-        System.out.println("\nTipp formátuma:");
-        System.out.println("    első karakter (oszlop): nagybetű (A-H)");
-        System.out.println("    második karakter (sor): számok (1-8)");
-        System.out.println("\nA tábla jelmagyarázata:");
-        System.out.println("    O: volt tipp, de találat nem");
-        System.out.println("    X: volt tipp, sikeres találat");
-        System.out.println("    -: nem volt tipp");
-
-        int maxNumberOfTips = 40;
-
-        System.out.println("\nÖsszesen " + maxNumberOfTips + " tipp van.\n");
-
-        while (maxNumberOfTips > 0) {
-            String guess = scan.nextLine();
-            if (correctGuess(guess)) {
-                int[] field = getCoordinates(guess);
-                if (guessArray[field[0]][field[1]] == 0) {
-                    Integer index = shipField[field[0]][field[1]];
-                    if (index == null) {
-                        guessArray[field[0]][field[1]] = 1;
-                        System.out.println("\nNem talált.\n");
-                    } else {
-                        guessArray[field[0]][field[1]] = 2;
-                        System.out.println("\nTalált.\n");
-                        lifeOfShips[index]--;
-                        if (lifeOfShips[index] == 0) {
-                            System.out.println("Süllyedt.\n");
-                            if (allShipsAreSinked()) {
-                                System.out.println("\nSikerült megtalálni az összes hajót.\n");
-                                System.out.println(this);
-                                break;
-                            }
-                        }
-                    }
-
-                    System.out.println(this);
-                    maxNumberOfTips--;
-                    System.out.println("\n" + maxNumberOfTips + " tipp maradt.\n");
+        for (int i = 0; i < SIDE_LENGTH; i++) {
+            builder.append((i + 1) + " ");
+            for (int j = 0; j < SIDE_LENGTH; j++) {
+                switch (guessArray[i][j]) {
+                    case 0:
+                        builder.append('-');
+                        break;
+                    case 1:
+                        builder.append('O');
+                        break;
+                    case 2:
+                        builder.append('X');
+                        break;
                 }
+
+                builder.append(' ');
             }
+
+            builder.append("\n");
         }
 
-        if (!allShipsAreSinked()) {
-            System.out.println("\nNem sikerült megtalálni az összes hajót.\n");
-            System.out.println("A megoldás:\n");
-            revealSolution();
-            System.out.println(this);
-        }
+        return builder.toString();
     }
 
     public static void main(String[] args) {

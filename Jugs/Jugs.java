@@ -1,9 +1,10 @@
 // k < m, k < n
-public class MainJugs {
+public class Jugs {
     private static void jug1(int m, int n, int k) {
         if(!((k < m) && (k < n))) {
             return;
         }
+
         int contentM = m;
         int contentN = 0;
         System.out.println("(" + contentM + "," + contentN + ")");
@@ -21,6 +22,7 @@ public class MainJugs {
         if(!((k < m) && (k < n) && (contentM < m))) {
             return;
         }
+
         int contentN = n;
         System.out.println("(" + contentM + "," + contentN + ")");
         if ((m - contentM) >= n) {
@@ -30,6 +32,7 @@ public class MainJugs {
             contentM -= (m - contentM);
             contentN += n;
         }
+
         System.out.println("(" + contentM + "," + contentN + ")");
         if ((k == contentM) || (k == contentN) || (contentN > n)) {
             return;

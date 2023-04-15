@@ -1,8 +1,29 @@
 import java.util.Random;
 
-public class MainChessNQueenProblem {
-    Random random = new Random();
+public class ChessNQueenProblem {
+    public Random random = new Random();
+
     private final int n = ((int) (8 * random.nextFloat())) + 1;
+
+    public boolean solveNQueenProblem() {
+        System.out.println(n + " db királynő:\n");
+
+        int solution[][] = new int[n][n];
+
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < n; y++) {
+                solution[x][y] = 0;
+            }
+        }
+
+        if (placeQueens(solution, 0) == false) {
+            System.out.println("Nem létezik megoldás.");
+            return false;
+        }
+        
+        printSolution(solution);
+        return true;
+    }
 
     private boolean isSafe(int x, int y, int solution[][]) {
         int i = 0;
@@ -44,7 +65,7 @@ public class MainChessNQueenProblem {
         }
     }
 
-    private boolean solveNQUtil(int solution[][], int y) {
+    private boolean placeQueens(int solution[][], int y) {
         if (y >= n) {
             return true;
         }
@@ -53,7 +74,7 @@ public class MainChessNQueenProblem {
             if (isSafe(i, y, solution)) {
                 solution[i][y] = 1;
  
-                if (solveNQUtil(solution, (y + 1)) == true) {
+                if (placeQueens(solution, (y + 1)) == true) {
                     return true;
                 }
  
@@ -64,28 +85,8 @@ public class MainChessNQueenProblem {
         return false;
     }
 
-    public boolean solveNQ() {
-        System.out.println(n + " db királynő:\n");
-
-        int solution[][] = new int[n][n];
-
-        for (int x = 0; x < n; x++) {
-            for (int y = 0; y < n; y++) {
-                solution[x][y] = 0;
-            }
-        }
-
-        if (solveNQUtil(solution, 0) == false) {
-            System.out.println("Nem létezik megoldás.");
-            return false;
-        }
-        
-        printSolution(solution);
-        return true;
-    }
-
     public static void main(String[] args) {
-        MainChessNQueenProblem nqp = new MainChessNQueenProblem();
-        nqp.solveNQ();
+        ChessNQueenProblem nqp = new ChessNQueenProblem();
+        nqp.solveNQueenProblem();
     }
 }
