@@ -1,16 +1,35 @@
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * <h1>Tili-toli puzzle</h1>
+ */
 public class Puzzle {
+
+    /**
+     * <p>Kezdeti állapot (számok elhelyezkedése).</p>
+     */
     private int[][] position;
 
+
+    /**
+     * <p>Sorok száma.</p>
+     */
     private final int numRows;
+
+    /**
+     * <p>Oszlopok száma.</p>
+     */
     private final int numColums;
+
+    /**
+     * <p>Végső állapot.</p>
+     */
     private final int[][] endPosition;
 
     public Puzzle(int[][] position) {
         if (position.length != position[0].length) {
-            throw new IllegalArgumentException("Négyzetes tili-toli kell!");
+            throw new IllegalArgumentException("N\u00E9gyzetes tili-toli kell!");
         }
 
         this.position = position;
@@ -20,14 +39,27 @@ public class Puzzle {
         this.endPosition = generateEndPosition(position.length);
     }
 
+    /**
+     * @return kezdeti állapot
+     */
     public int[][] getPosition() {
         return this.position;
     }
 
+    /**
+     * @return végső állapot
+     */
     public int[][] getEndPosition() {
         return this.endPosition;
     }
 
+    /**
+     * <p>Két állapot azonos-e<./p>
+     * 
+     * @param p1 egyik állapot
+     * @param p2 másik állapot
+     * @return igaz, ha azonos
+     */
     public static boolean puzzleEquality(int[][] p1, int[][] p2) {
         // if ((p1.length != p2.length) || (p1[0].length != p2[0].length)) {
             // return false;
@@ -44,14 +76,31 @@ public class Puzzle {
         return true;
     }
 
+    /**
+     * <p>Szám páratlan-e.</p>
+     * 
+     * @param num szám
+     * @return igaz, ha páratlan
+     */
     public static boolean isOdd(int num) {
         return (num % 2) != 0;
     }
 
+    /**
+     * <p>Szám páros-e.</p>
+     * 
+     * @param num szám
+     * @return igaz, ha páros
+     */
     public static boolean isEven(int num) {
         return (num % 2) == 0;
     }
 
+    /**
+     * <p>Lehetséges további mozgások.</p>
+     * 
+     * @return mozgások listája
+     */
     public List<Puzzle> getMoves() {
         List<Puzzle> moves = new ArrayList<>();
         int[] blank = getCoordinates(0); // üres mező koordinátái
@@ -75,6 +124,11 @@ public class Puzzle {
         return moves;
     }
 
+    /**
+     * <p>A kezdeti állapotot meg lehet-e oldani (végső állapotba tolni).</p>
+     * 
+     * @return igaz, ha megoldható
+     */
     public boolean isSolvable() {
         int inversionsCount = getInversionsCount();
         int blankPosition = getBlankSpaceRowCountingFromBottom();
@@ -90,6 +144,14 @@ public class Puzzle {
         }
     }
 
+    /**
+     * <p>Végső állapot definiálása.<p>
+     * 
+     * <p>Alul jobbra van a nulla (lyuk).<p>
+     * 
+     * @param n puzzle szélének hossza
+     * @return a végső állapot
+     */
     private static int[][] generateEndPosition(int n) {
         int[][] finalPosition = new int[n][n];
 
@@ -106,6 +168,15 @@ public class Puzzle {
         return finalPosition;
     }
 
+    /**
+     * <p>Számok cseréje (mozgásokhoz).<p>
+     * 
+     * @param x1 egyik szám sora
+     * @param y1 egyik szám oszlopa
+     * @param x2 másik szám sora
+     * @param y2 másik szám oszlopa
+     * @return csere utáni állapot
+     */
     private int[][] swap(int x1, int y1, int x2, int y2) {
         int[][] puzzleCopy = new int[this.numRows][this.numColums];
 
@@ -122,10 +193,21 @@ public class Puzzle {
         return puzzleCopy;
     }
 
+    /**
+     * <p>Alulról hanyadik sorban található a nulla.</p>
+     * 
+     * @return sorszám
+     */
     private int getBlankSpaceRowCountingFromBottom() {
         return this.numRows - getCoordinates(0)[0];
     }
 
+    /**
+     * <p>Szám koordinátái.</p>
+     * 
+     * @param tile szám
+     * @return sor oszlop
+     */
     private int[] getCoordinates(int tile) {
         for (int i = 0; i < this.numRows; i++) {
             for (int j = 0; j < this.numColums; j++) {
@@ -135,9 +217,16 @@ public class Puzzle {
             }
         }
 
-        throw new RuntimeException("Nincs ilyen cella érték!");
+        throw new RuntimeException("Nincs ilyen cella \u00E9rt\u00E9k!");
     }
 
+    /**
+     * <p>Szám koordinátái.</p>
+     * 
+     * @param tile szám
+     * @param position sor oszlop
+     * @return
+     */
     private int[] getCoordinates(int tile, int[][] position) {
         for (int i = 0; i < this.numRows; i++) {
             for (int j = 0; j < this.numColums; j++) {
@@ -147,9 +236,14 @@ public class Puzzle {
             }
         }
 
-        throw new RuntimeException("Nincs ilyen cella érték!");
+        throw new RuntimeException("Nincs ilyen cella \u00E9rt\u00E9k!");
     }
 
+    /**
+     * <p>Kezdeti állapot inverzióinak száma</p>
+     * 
+     * @return inverziók száma
+     */
     private int getInversionsCount() {
         int invCount = 0;
 

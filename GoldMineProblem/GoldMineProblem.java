@@ -1,13 +1,36 @@
 import java.util.Random;
 
+/**
+ * <h1>Aranybánya probléma</h1>
+ */
 public class GoldMineProblem {
+
+    /**
+     * <p>Véletlen generátor.</p>
+     */
     public Random random = new Random();
 
+
+    /**
+     * <p>Sor.</p>
+     */
     private final int m;
+
+    /**
+     * <p>Oszlop.</p>
+     */
     private final int n;
 
+
+    /**
+     * <p>Aranybánya.</p>
+     */
     private int[][] goldMine;
 
+
+    /**
+     * <p>Kibányászott aranymennyiség.</p>
+     */
     private int[][] goldQuantity;
 
     public GoldMineProblem() {
@@ -23,6 +46,9 @@ public class GoldMineProblem {
         }
     }
 
+    /**
+     * <p>Aranybánya megjelenítése.</p>
+     */
     public void printGoldMine() {
         System.out.println("Gold mine (" + m + " x " + n + "):");
         for (int i = 0; i < m; i++) {
@@ -34,6 +60,9 @@ public class GoldMineProblem {
         }
     }
 
+    /**
+     * <p>Megoldás megjelenítése.</p>
+     */
     public void printSolution() {
         solveGoldMineProblem();
 
@@ -55,6 +84,9 @@ public class GoldMineProblem {
         System.out.println("Maximum gold quantity: " + maxGoldQuantity);
     }
 
+    /**
+     * <p>Legnagyobb aranymennyiség keresése.</p>
+     */
     private void solveGoldMineProblem() {
         this.goldQuantity = new int[this.m][this.n];
 

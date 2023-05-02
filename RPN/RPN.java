@@ -1,6 +1,18 @@
 import java.util.Stack;
+import java.util.Queue;
+import java.util.LinkedList;
 
+/**
+ * <h1>Fordított lengyel jelölés</h1>
+ */
 public class RPN {
+
+    /**
+     * <p>Művelet precedens értéke.</p>
+     * 
+     * @param operator művelet
+     * @return precedens érték
+     */
     public static int precedenceValue(String operator) {
         switch (operator) {
             case "^":
@@ -11,97 +23,119 @@ public class RPN {
             case "+":
             case "-":
                 return 0;
-            default:
+            default: // nem művelet (szám)
                 return -1;
         }
     }
 
-    public static Stack<String> expressionToStack(String expression) {
-        Stack<String> strStack = new Stack<>();
-        for (String element : expression.split(" ")) {
-            strStack.push(element);
-        }
-
-        return strStack;
+    /**
+     * <p>Kifejezés (String) felbontása.</p>
+     * 
+     * @param expression kifejezés szövege
+     * @return kifejezés szöveghalmazként
+     */
+    public static String[] expressionToArray(String expression) {
+        return expression.split(" ");
     }
 
-    public static String infixToPostfix(Stack<String> infixExpression) {
-        Stack<String> stack1 = new Stack<>();
-        Stack<String> stack2 = new Stack<>();
-        int i = 0;
-        int parenthesesLevel = 0;
-        int maxPrecedence = 0;
-        int maxPrecedenceIndex = 0;
+    /**
+     * <p>"Hagyományos" kifejezés átalakítása "fordított lengyel jelölésűvé".</p>
+     * 
+     * @param infixExpression "hagyományos" kifejezés szöveghalmaza
+     * @return kifejezés "fordított lengyel jelölésűvé" átalakítva "Stack" típusként
+     */
+    public static Stack<String> infixToPostfix(String[] infixExpression) {
+        // kezdeti tároló
+        Queue<String> quene = new LinkedList<>(); // elemek
+        Queue<Integer> precedenceQuene = new LinkedList<>(); // precedensek
+
+        // a megoldás
+        Stack<String> stack = new Stack<>(); 
+        Stack<Integer> precedenceStack = new Stack<>();
+
+        // ideiglenes tároló
+        Queue<String> tmpQuene = new LinkedList<>();
+        Queue<Integer> tmpPrecedenceQuene = new LinkedList<>();
+
+        int parenthesesLevel = 0; // zárójel szintje
+
+        // kifejezés vizsgálata
         for (String element : infixExpression) {
-            if (element.matches("[0-9]") || (element.length() > 1)) {
-                stack1.push(element);
+            if (element.matches("[0-9]") || (element.length() > 1)) { // szám
+                quene.add(element);
+                precedenceQuene.add(precedenceValue(element)); // -1
             } else if (element.equals("(")) {
-                stack1.push(element);
                 parenthesesLevel += 3;
             } else if (element.equals(")")) {
-                stack1.push(element);
                 parenthesesLevel -= 3;
-            } else {
-                int precedence = parenthesesLevel + precedenceValue(element);
-                if (i <= 1) {
-                    maxPrecedence = precedence;
-                    maxPrecedenceIndex = i;
-                }
-                if (precedence > maxPrecedence) {
-                    maxPrecedence = precedence;
-                    maxPrecedenceIndex = i;
-                }
-
-                stack1.push(element);
+            } else { // művelet
+                quene.add(element);
+                precedenceQuene.add(parenthesesLevel + precedenceValue(element));
             }
-
-            i++;
         }
 
-        i = 0;
-        String maxPrecedenceNum1 = "";
-        String maxPrecedenceOperator = "";
-        for (String element : stack1) {
-            if (i == (maxPrecedenceIndex - 2)) {
-                if (!element.equals("(")) {
-                    stack2.push(element);
+        // kezdés
+        stack.push(quene.poll()); // szám hozzáadása a megoldáshoz
+        precedenceStack.push(precedenceQuene.poll());
+
+        // elemek rendezése (a megoldásba)
+        while (!quene.isEmpty()) {
+            if (precedenceQuene.peek() == -1) { // szám
+                // szám hozzáadása a megoldáshoz
+                stack.push(quene.poll());
+                precedenceStack.push(precedenceQuene.poll());
+
+                // ideiglenes tárolóban lévő műveletek hozzáadása a megoldáshoz
+                while (!tmpQuene.isEmpty()) {
+                    stack.push(tmpQuene.poll());
+                    precedenceStack.push(tmpPrecedenceQuene.poll());
+
+                    // megoldásban lévő, kisebb precedensű művelet visszahelyezése
+                    if (!tmpPrecedenceQuene.isEmpty() && (tmpPrecedenceQuene.peek() > precedenceStack.peek())) {
+                        tmpQuene.add(stack.pop());
+                        tmpPrecedenceQuene.add(precedenceStack.pop());
+                    }
                 }
-            } else if (i == (maxPrecedenceIndex - 1)) {
-                maxPrecedenceNum1 = element;
-            } else if (i == maxPrecedenceIndex) {
-                maxPrecedenceOperator = element;
-            } else if (i == (maxPrecedenceIndex + 1)) {
-                stack2.push(maxPrecedenceNum1 + " " + element + " " + maxPrecedenceOperator);
-            } else if (i == (maxPrecedenceIndex + 2)) {
-                if (!element.equals(")")) {
-                    stack2.push(element);
+            } else { // művelet
+                // művelet hozzáadása az ideiglenes tárolóhoz
+                tmpQuene.add(quene.poll());
+                tmpPrecedenceQuene.add(precedenceQuene.poll());
+
+                if (tmpPrecedenceQuene.peek() > precedenceStack.peek()) {
+                    // nagyobb az előző művelet precedencsénél
+                    // (kezdetben szám)
+
+                    // megoldásban lévő kisebb precedensű műveletek áthelyezése
+                    // az ideiglenes tárolóba
+                    while (precedenceStack.peek() != -1) {
+                        tmpQuene.add(stack.pop());
+                        tmpPrecedenceQuene.add(precedenceStack.pop());
+                    }
                 }
-            } else {
-                stack2.push(element);
             }
-
-            i++;
         }
 
-        stack1.clear();
-        for (String element : stack2) {
-            stack1.push(element);
-        }
+        return stack;
+    }
 
-        stack2.clear();
-        if (stack1.size() == 1) {
-            return stack1.peek();
-        } else {
-            return infixToPostfix(stack1);
+    /**
+     * <p>"Stack" típus megjelenítése.</p>
+     * 
+     * @param stack (kifejezés)
+     */
+    public static void printStack(Stack<String> stack) {
+        for (String element : stack) {
+            System.out.printf(element + " ");
         }
+        System.out.println();
     }
 
     public static void main(String[] args) {
-        System.out.println(infixToPostfix(expressionToStack("1 + 2 - 3 ^ 4")));
-        System.out.println(infixToPostfix(expressionToStack("1 ^ 2 - 3 * 4")));
-        System.out.println(infixToPostfix(expressionToStack("1 + 2 * 3 - 4 ^ 5 + 6")));
-        System.out.println(infixToPostfix(expressionToStack("( 5 + 4 ) * 3 + ( 4 ^ ( 5 - 6 ) )")));
-        System.out.println(infixToPostfix(expressionToStack("9 + 8 + 7 / 6 + 5 + 4 * ( 7 + 8 )")));
-        System.out.println(infixToPostfix(expressionToStack("9 - 1 - 2 - 3 * 2 - 10")));
+        printStack(infixToPostfix(expressionToArray("1 + 2 - 3 ^ 4")));
+        printStack(infixToPostfix(expressionToArray("1 ^ 2 - 3 * 4")));
+        printStack(infixToPostfix(expressionToArray("1 + 2 * 3 - 4 ^ 5 + 6")));
+        printStack(infixToPostfix(expressionToArray("( 5 + 4 ) * 3 + ( 4 ^ ( 5 - 6 ) )")));
+        printStack(infixToPostfix(expressionToArray("9 + 8 + 7 / 6 + 5 + 4 * ( 7 + 8 )")));
+        printStack(infixToPostfix(expressionToArray("9 - 1 - 2 - 3 * 2 - 10")));
     }
 }
